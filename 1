@@ -1,0 +1,76 @@
+import simplekml
+import math
+
+def generate_circle_coords(center, radius, num_points=36):
+    lat, lon = center
+    coords = []
+    for i in range(num_points):
+        angle = math.radians(float(i) / num_points * 360.0)
+        dx = radius * math.cos(angle)
+        dy = radius * math.sin(angle)
+        point_lat = lat + (dy / 111111)  # 1 degree of latitude = 111111 meters
+        point_lon = lon + (dx / (111111 * math.cos(math.radians(lat))))
+        coords.append((point_lat, point_lon))
+    coords.append(coords[0])  # Close the polygon
+    return coords
+
+def generate_square_coords(center, side_length):
+    lat, lon = center
+    half_side = side_length / 2
+    d_lat = half_side / 111111
+    d_lon = half_side / (111111 * math.cos(math.radians(lat)))
+    return [
+        (lat + d_lat, lon - d_lon),
+        (lat + d_lat, lon + d_lon),
+        (lat - d_lat, lon + d_lon),
+        (lat - d_lat, lon - d_lon),
+        (lat + d_lat, lon - d_lon)  # Close the polygon
+    ]
+
+def generate_triangle_coords(center, side_length):
+    lat, lon = center
+    height = side_length * (math.sqrt(3) / 2)
+    d_lat = height / (3 * 111111)
+    d_lon = side_length / (2 * 111111 * math.cos(math.radians(lat)))
+    return [
+        (lat + 2*d_lat, lon),
+        (lat - d_lat, lon - d_lon),
+        (lat - d_lat, lon + d_lon),
+        (lat + 2*d_lat, lon)  # Close the polygon
+    ]
+
+def create_polygon_kml(polygon_type, center, size, output_file):
+    kml = simplekml.Kml()
+    pol = kml.newpolygon(name=f"My {polygon_type.capitalize()}")
+
+    if polygon_type == "circle":
+        coords = generate_circle_coords(center, size)
+    elif polygon_type == "square":
+        coords = generate_square_coords(center, size)
+    elif polygon_type == "triangle":
+        coords = generate_triangle_coords(center, size)
+    else:
+        raise ValueError("Invalid polygon type. Choose 'circle', 'square', or 'triangle'.")
+
+    pol.outerboundaryis = coords
+    pol.style.linestyle.color = simplekml.Color.blue
+    pol.style.linestyle.width = 2
+    pol.style.polystyle.color = simplekml.Color.changealphaint(100, simplekml.Color.green)
+
+    kml.save(output_file)
+
+# Example usage
+if __name__ == "__main__":
+    # San Francisco coordinates (latitude, longitude)
+    center_point = (37.7749, -122.4194)
+    
+    # Generate circle with 1km radius
+    create_polygon_kml("circle", center_point, 1000, "sf_circle.kml")
+    
+    # Generate square with 2km side length
+    create_polygon_kml("square", center_point, 2000, "sf_square.kml")
+    
+    # Generate triangle with 3km side length
+    create_polygon_kml("triangle", center_point, 3000, "sf_triangle.kml")
+
+    print("KML files have been created: sf_circle.kml, sf_square.kml, sf_triangle.kml")

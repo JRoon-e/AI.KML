@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+    <Document id="1">
+        <Style id="8">
+            <LineStyle id="9">
+                <color>ffff0000</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="10">
+                <color>64008000</color>
+                <colorMode>normal</colorMode>
+                <fill>1</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Placemark id="3">
+            <name>My Triangle</name>
+            <LookAt>
+                <longitude>-117.88384582320379</longitude>
+                <latitude>33.6561144</latitude>
+                <altitude>200.0</altitude>
+                <heading>0</heading>
+                <tilt>45</tilt>
+                <range>12000.0</range>
+            </LookAt>
+            <styleUrl>#8</styleUrl>
+            <Polygon id="2">
+                <extrude>1</extrude>
+                <altitudeMode>absolute</altitudeMode>
+                <outerBoundaryIs>
+                    <LinearRing id="6">
+                        <coordinates>33.67170287285659,-117.88384582320379,200.0 33.648320163571704,-117.90006441565781,200.0 33.648320163571704,-117.86762723074976,200.0 33.67170287285659,-117.88384582320379,200.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+    </Document>
+</kml>

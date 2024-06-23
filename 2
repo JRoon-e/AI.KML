@@ -1,0 +1,97 @@
+import simplekml
+import math
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut, GeocoderServiceError
+
+def geocode_address(address):
+    geolocator = Nominatim(user_agent="my_kml_generator")
+    try:
+        location = geolocator.geocode(address)
+        if location:
+            return location.latitude, location.longitude
+        else:
+            print("Address not found. Please try again.")
+            return None
+    except (GeocoderTimedOut, GeocoderServiceError):
+        print("Geocoding service timed out or error occurred. Please try again.")
+        return None
+
+def generate_circle_coords(center, radius, num_points=36):
+    lat, lon = center
+    coords = []
+    for i in range(num_points):
+        angle = math.radians(float(i) / num_points * 360.0)
+        dx = radius * math.cos(angle)
+        dy = radius * math.sin(angle)
+        point_lat = lat + (dy / 111111)  # 1 degree of latitude = 111111 meters
+        point_lon = lon + (dx / (111111 * math.cos(math.radians(lat))))
+        coords.append((point_lat, point_lon))
+    coords.append(coords[0])  # Close the polygon
+    return coords
+
+def generate_square_coords(center, side_length):
+    lat, lon = center
+    half_side = side_length / 2
+    d_lat = half_side / 111111
+    d_lon = half_side / (111111 * math.cos(math.radians(lat)))
+    return [
+        (lat + d_lat, lon - d_lon),
+        (lat + d_lat, lon + d_lon),
+        (lat - d_lat, lon + d_lon),
+        (lat - d_lat, lon - d_lon),
+        (lat + d_lat, lon - d_lon)  # Close the polygon
+    ]
+
+def generate_triangle_coords(center, side_length):
+    lat, lon = center
+    height = side_length * (math.sqrt(3) / 2)
+    d_lat = height / (3 * 111111)
+    d_lon = side_length / (2 * 111111 * math.cos(math.radians(lat)))
+    return [
+        (lat + 2*d_lat, lon),
+        (lat - d_lat, lon - d_lon),
+        (lat - d_lat, lon + d_lon),
+        (lat + 2*d_lat, lon)  # Close the polygon
+    ]
+
+def create_polygon_kml(polygon_type, center, size, output_file):
+    kml = simplekml.Kml()
+    pol = kml.newpolygon(name=f"My {polygon_type.capitalize()}")
+
+    if polygon_type == "circle":
+        coords = generate_circle_coords(center, size)
+    elif polygon_type == "square":
+        coords = generate_square_coords(center, size)
+    elif polygon_type == "triangle":
+        coords = generate_triangle_coords(center, size)
+    else:
+        raise ValueError("Invalid polygon type. Choose 'circle', 'square', or 'triangle'.")
+
+    pol.outerboundaryis = coords
+    pol.style.linestyle.color = simplekml.Color.blue
+    pol.style.linestyle.width = 2
+    pol.style.polystyle.color = simplekml.Color.changealphaint(100, simplekml.Color.green)
+
+    kml.save(output_file)
+    print(f"KML file '{output_file}' has been created.")
+
+def main():
+    address = input("Enter a street address: ")
+    center = geocode_address(address)
+    
+    if center:
+        print(f"Coordinates: {center}")
+        
+        while True:
+            polygon_type = input("Enter polygon type (circle, square, or triangle): ").lower()
+            if polygon_type in ["circle", "square", "triangle"]:
+                break
+            print("Invalid polygon type. Please choose circle, square, or triangle.")
+        
+        size = float(input("Enter size in meters (radius for circle, side length for square/triangle): "))
+        
+        output_file = f"{polygon_type}_at_{address.replace(' ', '_')}.kml"
+        create_polygon_kml(polygon_type, center, size, output_file)
+
+if __name__ == "__main__":
+    main()

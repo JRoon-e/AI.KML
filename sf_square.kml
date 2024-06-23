@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+    <Document id="12">
+        <Style id="19">
+            <LineStyle id="20">
+                <color>ffff0000</color>
+                <colorMode>normal</colorMode>
+                <width>2</width>
+            </LineStyle>
+            <PolyStyle id="21">
+                <color>64008000</color>
+                <colorMode>normal</colorMode>
+                <fill>1</fill>
+                <outline>1</outline>
+            </PolyStyle>
+        </Style>
+        <Placemark id="14">
+            <name>My Square</name>
+            <styleUrl>#19</styleUrl>
+            <Polygon id="13">
+                <outerBoundaryIs>
+                    <LinearRing id="17">
+                        <coordinates>37.7839,-122.4307=,0.0 37.783900009000014,-122.40801368657115,0.0 37.76589999099999,-122.40801368657115,0.0 37.76589999099999,-122.43078631342884,0.0 37.783900009000014,-122.43078631342884,0.0</coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+    </Document>
+</kml>
