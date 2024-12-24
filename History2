@@ -1,0 +1,219 @@
+from simplekml import Kml, Style
+from datetime import datetime, timedelta
+
+# Create a KML file
+kml = Kml()
+
+# Define time period
+start_date = datetime(1941, 12, 8)  # Start of Japanese invasion
+rescue_date = datetime(1944, 7, 10)  # Rescue by USS McCall
+
+# Define the coordinates and details for all locations
+locations = {
+    "Initial Landing Point (Agat)": {
+        "coords": (13.3897, 144.6567),
+        "description": "Japanese forces landed here on December 8, 1941. Tweed began his escape from this area.",
+        "style": "red",
+        "timestamp": "1941-12-08"
+    },
+    "Adelup Point": {
+        "coords": (13.4716, 144.7327),
+        "description": "Strategic point overlooking Agana Bay. Tweed used this vantage point to observe ship movements.",
+        "style": "yellow"
+    },
+    "Asan": {
+        "coords": (13.4601, 144.7133),
+        "description": "Village where Tweed received crucial support. The Punzalan family was particularly helpful.",
+        "style": "yellow"
+    },
+    "Piti": {
+        "coords": (13.4561, 144.6989),
+        "description": "Area Tweed frequently traversed. Contains several smaller caves he used temporarily.",
+        "style": "yellow"
+    },
+    "Sumay": {
+        "coords": (13.4278, 144.6705),
+        "description": "Former naval facility. Tweed avoided this area due to heavy Japanese presence.",
+        "style": "red"
+    },
+    "Cabras Island": {
+        "coords": (13.4560, 144.6610),
+        "description": "Strategic location in Apra Harbor. Japanese maintained strong presence here.",
+        "style": "red"
+    },
+    "Orote Peninsula": {
+        "coords": (13.4389, 144.6253),
+        "description": "Location of pre-war naval air station. Heavy Japanese fortification.",
+        "style": "red"
+    },
+    "Primary Cave Hideout": {
+        "coords": (13.47, 144.69),
+        "description": """Main hideout from 1942-1944. Features:
+        - Natural cave system with multiple exits
+        - Excellent vantage point over Piti and Asan
+        - Fresh water source nearby
+        - Dense jungle cover
+        - Hidden from main paths""",
+        "style": "green",
+        "timestamp": "1942-03-15"
+    }
+}
+
+# Add helper locations
+helper_locations = {
+    "Punzalan Family Home": {
+        "coords": (13.4605, 144.7140),
+        "description": "The Punzalan family provided food and information throughout the occupation",
+        "style": "blue",
+        "timestamp": "1942-01-15"
+    },
+    "Antonio Artero Ranch": {
+        "coords": (13.4680, 144.7050),
+        "description": "Antonio Artero provided significant aid, including food and medicine",
+        "style": "blue",
+        "timestamp": "1942-06-01"
+    },
+    "Water Source": {
+        "coords": (13.4695, 144.6920),
+        "description": "Fresh water spring Tweed used throughout his hiding period",
+        "style": "blue"
+    },
+    "Signal Point": {
+        "coords": (13.4710, 144.7000),
+        "description": "Location where Tweed successfully signaled USS McCall for rescue",
+        "style": "green",
+        "timestamp": "1944-07-10"
+    }
+}
+
+# Define Japanese patrol routes
+patrol_routes = {
+    "Coastal Patrol": {
+        "coords": [
+            (144.6567, 13.3897),  # Agat
+            (144.6705, 13.4278),  # Sumay
+            (144.6610, 13.4560),  # Cabras
+            (144.7327, 13.4716)   # Adelup
+        ],
+        "description": "Regular Japanese coastal patrol route"
+    },
+    "Mountain Patrol": {
+        "coords": [
+            (144.6989, 13.4561),  # Piti
+            (144.7050, 13.4680),  # Near Artero Ranch
+            (144.7133, 13.4601)   # Asan
+        ],
+        "description": "Japanese mountain search patrols"
+    }
+}
+
+# Create styles
+styles = {
+    "red": kml.newstyle(
+        iconstyle=kml.newiconstyle(
+            color='ff0000ff',  # Red
+            scale=1.2,
+            icon=kml.newicon(href='http://maps.google.com/mapfiles/kml/shapes/target.png')
+        )
+    ),
+    "yellow": kml.newstyle(
+        iconstyle=kml.newiconstyle(
+            color='ff00ffff',  # Yellow
+            scale=1.0,
+            icon=kml.newicon(href='http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png')
+        )
+    ),
+    "green": kml.newstyle(
+        iconstyle=kml.newiconstyle(
+            color='ff00ff00',  # Green
+            scale=1.4,
+            icon=kml.newicon(href='http://maps.google.com/mapfiles/kml/shapes/triangle.png')
+        )
+    ),
+    "blue": kml.newstyle(
+        iconstyle=kml.newiconstyle(
+            color='ffff0000',  # Blue
+            scale=1.0,
+            icon=kml.newicon(href='http://maps.google.com/mapfiles/kml/shapes/star.png')
+        )
+    )
+}
+
+# Create a folder for terrain features
+terrain_folder = kml.newfolder(name='Terrain Features')
+
+# Add terrain polygons
+jungle_area = terrain_folder.newpolygon(
+    name='Dense Jungle Cover',
+    outerboundaryis=[
+        (144.69, 13.47),    # Near cave
+        (144.70, 13.468),
+        (144.71, 13.465),
+        (144.69, 13.46)
+    ]
+)
+jungle_area.style.polystyle.color = '7f00ff00'  # Semi-transparent green
+
+# Add locations to the KML
+for name, info in {**locations, **helper_locations}.items():
+    point = kml.newpoint(
+        name=name,
+        coords=[(info["coords"][1], info["coords"][0])],
+        description=info["description"]
+    )
+    point.style = styles[info["style"]]
+    if "timestamp" in info:
+        point.timestamp.when = info["timestamp"]
+
+# Add patrol routes
+for name, route in patrol_routes.items():
+    path = kml.newlinestring(
+        name=name,
+        description=route["description"],
+        coords=[(lon, lat) for lon, lat in route["coords"]]
+    )
+    path.style.linestyle.width = 3
+    path.style.linestyle.color = 'ff0000ff'  # Red
+
+# Add Tweed's movement timeline
+movements = kml.newfolder(name='Tweed\'s Movements')
+
+# Early period (Dec 1941 - Mar 1942)
+early_movement = movements.newlinestring(
+    name="Initial Evasion Period",
+    description="First months of hiding, moving between temporary locations",
+    coords=[
+        (144.6567, 13.3897),  # Agat
+        (144.6989, 13.4561),  # Piti
+        (144.7133, 13.4601)   # Asan
+    ]
+)
+early_movement.timespan.begin = "1941-12-08"
+early_movement.timespan.end = "1942-03-15"
+early_movement.style.linestyle.color = '7fff0000'  # Semi-transparent blue
+
+# Main hiding period (Mar 1942 - Jul 1944)
+main_period = movements.newlinestring(
+    name="Main Hiding Period",
+    description="Period in and around the main cave hideout",
+    coords=[
+        (144.69, 13.47),      # Cave
+        (144.7050, 13.4680),  # Artero Ranch
+        (144.7140, 13.4605)   # Punzalan Home
+    ]
+)
+main_period.timespan.begin = "1942-03-15"
+main_period.timespan.end = "1944-07-10"
+main_period.style.linestyle.color = '7f00ff00'  # Semi-transparent green
+
+# Add view information
+view = kml.document.lookat
+view.latitude = 13.45
+view.longitude = 144.68
+view.altitude = 0
+view.range = 15000
+view.tilt = 45
+view.heading = 0
+
+# Save the KML file
+kml.save("Tweed_Detailed_Survival_Map.kml")
