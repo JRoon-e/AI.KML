@@ -1,0 +1,108 @@
+from simplekml import Kml, Style
+
+# Create a KML file
+kml = Kml()
+
+# Define the coordinates for the landmarks and hideouts
+locations = {
+    "Initial Landing Point (Agat)": {
+        "coords": (13.3897, 144.6567),
+        "description": "Area where Japanese forces initially landed",
+        "style": "red"
+    },
+    "Adelup Point": {
+        "coords": (13.4716, 144.7327),
+        "description": "Strategic point overlooking Agana Bay",
+        "style": "yellow"
+    },
+    "Asan": {
+        "coords": (13.4601, 144.7133),
+        "description": "Village where Tweed received help from locals",
+        "style": "yellow"
+    },
+    "Piti": {
+        "coords": (13.4561, 144.6989),
+        "description": "Area Tweed traversed during his evasion",
+        "style": "yellow"
+    },
+    "Sumay": {
+        "coords": (13.4278, 144.6705),
+        "description": "Pre-war naval facility",
+        "style": "yellow"
+    },
+    "Cabras Island": {
+        "coords": (13.4560, 144.6610),
+        "description": "Strategic location in Apra Harbor",
+        "style": "yellow"
+    },
+    "Orote Peninsula": {
+        "coords": (13.4389, 144.6253),
+        "description": "Location of pre-war naval air station",
+        "style": "yellow"
+    },
+    "Primary Cave Hideout": {
+        "coords": (13.47, 144.69),
+        "description": "One of Tweed's main hiding locations, overlooking both Piti and Asan. Cave provided excellent vantage point while remaining hidden.",
+        "style": "green"
+    }
+}
+
+# Create styles
+styles = {
+    "red": kml.newstyle(
+        iconstyle=kml.newiconstyle(
+            color='ff0000ff',  # Red
+            scale=1.2,
+            icon=kml.newicon(href='http://maps.google.com/mapfiles/kml/shapes/target.png')
+        )
+    ),
+    "yellow": kml.newstyle(
+        iconstyle=kml.newiconstyle(
+            color='ff00ffff',  # Yellow
+            scale=1.0,
+            icon=kml.newicon(href='http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png')
+        )
+    ),
+    "green": kml.newstyle(
+        iconstyle=kml.newiconstyle(
+            color='ff00ff00',  # Green
+            scale=1.4,
+            icon=kml.newicon(href='http://maps.google.com/mapfiles/kml/shapes/triangle.png')
+        )
+    )
+}
+
+# Add locations to the KML
+for name, info in locations.items():
+    point = kml.newpoint(
+        name=name,
+        coords=[(info["coords"][1], info["coords"][0])],  # KML uses (longitude, latitude)
+        description=info["description"]
+    )
+    point.style = styles[info["style"]]
+
+# Add a path showing likely movement routes
+path = kml.newlinestring(
+    name="Estimated Movement Routes",
+    description="Likely paths used by Tweed during his 31-month evasion",
+    coords=[
+        (144.6567, 13.3897),  # Agat
+        (144.6989, 13.4561),  # Piti
+        (144.69, 13.47),      # Cave Hideout
+        (144.7133, 13.4601)   # Asan
+    ]
+)
+path.style.linestyle.width = 3
+path.style.linestyle.color = 'ff0000ff'  # Red
+
+# Add view information
+view = kml.document.lookat
+view.latitude = 13.45
+view.longitude = 144.68
+view.altitude = 0
+view.range = 15000
+view.tilt = 45
+view.heading = 0
+
+# Save the KML file
+kml.save("Tweed_Wartime_Hideout.kml")
