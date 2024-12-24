@@ -1,0 +1,149 @@
+from simplekml import Kml, Style
+from datetime import datetime, timedelta
+
+# Create a KML file
+kml = Kml()
+
+# Define time periods
+tweed_start = datetime(1941, 12, 8)    # Tweed's evasion begins
+liberation_date = datetime(1944, 7, 21) # Rooney's landing operation
+tweed_rescue = datetime(1944, 7, 10)    # Tweed's rescue
+
+# Landing operation coordinates from the map
+landing_zones = {
+    "Yellow Beach 1": {
+        "coords": (13.38089, 144.65370),  # From documented GPS fix
+        "description": "Initial landing zone for Marine forces, faced significant reef obstacles",
+        "style": "yellow"
+    },
+    "Yellow Beach 2": {
+        "coords": (13.3820, 144.6550),
+        "description": "Secondary landing zone, Weapons Company support position",
+        "style": "yellow"
+    },
+    "White Beach 1": {
+        "coords": (13.3835, 144.6565),
+        "description": "Northern landing zone with direct access to inland routes",
+        "style": "white"
+    },
+    "White Beach 2": {
+        "coords": (13.3850, 144.6580),
+        "description": "Northernmost landing zone, closest to Japanese defensive positions",
+        "style": "white"
+    }
+}
+
+# Key terrain features
+terrain_features = {
+    "Marmot Ridge": {
+        "coords": (13.3950, 144.6600),
+        "description": "Critical high ground overlooking landing beaches. Japanese defensive position in 1944, previously used by Tweed for observation.",
+        "style": "terrain"
+    },
+    "Mt Alifan": {
+        "coords": (13.3920, 144.6700),
+        "description": "Major terrain feature, provided concealment for Tweed and later became key military objective",
+        "style": "terrain"
+    },
+    "Agat Point": {
+        "coords": (13.3897, 144.6567),
+        "description": "Strategic coastal position, Japanese observation post during occupation",
+        "style": "terrain"
+    }
+}
+
+# Create new folder for liberation operations
+liberation_folder = kml.newfolder(name='Liberation Operations - July 1944')
+
+# Add landing craft approach vectors
+approach_vectors = liberation_folder.newfolder(name='Landing Craft Approaches')
+for beach, info in landing_zones.items():
+    # Create approach line from reef to beach
+    approach = approach_vectors.newlinestring(
+        name=f"{beach} Approach",
+        description=f"Landing craft approach vector for {beach}",
+        coords=[
+            (info["coords"][1] - 0.005, info["coords"][0] - 0.005),  # Start beyond reef
+            (info["coords"][1], info["coords"][0])  # Beach position
+        ]
+    )
+    approach.style.linestyle.width = 2
+    approach.style.linestyle.color = 'ff00ffff'  # Yellow
+
+# Add Weapons Company movements
+weapons_co_movements = liberation_folder.newfolder(name='Weapons Company Movements')
+rooney_advance = weapons_co_movements.newlinestring(
+    name="Weapons Company Advance",
+    description="Maj Rooney's unit advancement from beach to inland objectives",
+    coords=[
+        (144.65370, 13.38089),  # Landing point
+        (144.6600, 13.3950),    # Initial advance
+        (144.6700, 13.3920)     # Inland objective
+    ]
+)
+rooney_advance.timespan.begin = "1944-07-21"
+rooney_advance.timespan.end = "1944-07-22"
+rooney_advance.style.linestyle.color = 'ff0000ff'  # Red
+rooney_advance.style.linestyle.width = 3
+
+# Add comparative analysis folder
+comparison_folder = kml.newfolder(name='Historical Comparison')
+
+# Create overlapping areas of significance
+overlap_points = comparison_folder.newfolder(name='Shared Historical Points')
+shared_locations = {
+    "Mt Alifan Observation Point": {
+        "coords": (13.3920, 144.6700),
+        "description": """Location of strategic significance:
+        1941-44: Used by Tweed for concealment and observation
+        1944: Objective for Maj Rooney's Weapons Company
+        Demonstrates terrain's dual role in evasion and combat operations"""
+    },
+    "Agat Village Area": {
+        "coords": (13.3897, 144.6567),
+        "description": """Key location in both narratives:
+        1941: Starting point of Tweed's evasion
+        1944: Part of Maj Rooney's landing zone
+        Shows transformation from point of Japanese control to liberation"""
+    }
+}
+
+# Add existing Tweed elements from previous map...
+[Previous Tweed-related code remains the same]
+
+# Create styles for new elements
+styles.update({
+    "white": kml.newstyle(
+        iconstyle=kml.newiconstyle(
+            color='ffffffff',
+            scale=1.0,
+            icon=kml.newicon(href='http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png')
+        )
+    ),
+    "terrain": kml.newstyle(
+        iconstyle=kml.newiconstyle(
+            color='ff654321',
+            scale=1.2,
+            icon=kml.newicon(href='http://maps.google.com/mapfiles/kml/shapes/triangle.png')
+        )
+    )
+})
+
+# Add elevation contours (simplified for key areas)
+elevation_folder = kml.newfolder(name='Terrain Analysis')
+contour_lines = [
+    (13.38, 144.65, 13.39, 144.66),  # Beach to inland
+    (13.39, 144.66, 13.40, 144.67),  # Rising terrain
+    (13.40, 144.67, 13.41, 144.68)   # Mountain approach
+]
+
+for i, coords in enumerate(contour_lines):
+    contour = elevation_folder.newlinestring(
+        name=f"Elevation Contour {i+1}",
+        coords=[(coords[1], coords[0]), (coords[3], coords[2])]
+    )
+    contour.style.linestyle.width = 1
+    contour.style.linestyle.color = '7f000000'  # Semi-transparent black
+
+# Save enhanced KML file
+kml.save("Tweed_Rooney_Historical_Analysis.kml")
