@@ -9,7 +9,7 @@ import os
 import random
 import tempfile
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 from xml.dom import minidom
@@ -238,7 +238,13 @@ def record_feedback(feedback_file: Path, overlay_id: str, vote: int, note: str |
         notes = data.get("notes", [])
         if not isinstance(notes, list):
             notes = []
-        notes.append({"overlay": overlay_id, "note": note, "timestamp": datetime.utcnow().isoformat()})
+        notes.append(
+            {
+                "overlay": overlay_id,
+                "note": note,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        )
         data["notes"] = notes
 
     feedback_file.parent.mkdir(parents=True, exist_ok=True)
