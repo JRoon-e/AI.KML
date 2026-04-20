@@ -173,8 +173,8 @@ def choose_overlay(target_date: date, feedback_file: Path | None) -> OverlayThem
                 scores[overlay.identifier] -= 0.8
 
     weighted_scores = [max(0.1, scores[overlay.identifier]) for overlay in OVERLAYS]
-    rng = random.Random(target_date.toordinal())
-    return rng.choices(list(OVERLAYS), weights=weighted_scores, k=1)[0]
+    deterministic_random = random.Random(target_date.toordinal())
+    return deterministic_random.choices(list(OVERLAYS), weights=weighted_scores, k=1)[0]
 
 
 def apply_overlay(input_path: Path, output_path: Path, target_date: date, feedback_file: Path | None) -> OverlayTheme:
@@ -231,7 +231,12 @@ def record_feedback(feedback_file: Path, overlay_id: str, vote: int, note: str |
     votes = data.get("votes", {})
     if not isinstance(votes, dict):
         votes = {}
-    votes[overlay_id] = int(votes.get(overlay_id, 0)) + vote
+    prior_vote = votes.get(overlay_id, 0)
+    try:
+        prior_vote_value = float(prior_vote)
+    except (TypeError, ValueError):
+        prior_vote_value = 0.0
+    votes[overlay_id] = prior_vote_value + vote
     data["votes"] = votes
 
     if note:
@@ -257,7 +262,7 @@ def print_resources() -> None:
     print("- OGC KML 2.2 Standard: https://www.ogc.org/standards/kml/")
     print("- Google KML Reference: https://developers.google.com/kml/documentation/kmlreference")
     print("- Google KML Tutorial: https://developers.google.com/kml/documentation/kml_tut")
-    print("- KML Best Practices: https://developers.google.com/kml/documentation/kml_21tutorial")
+    print("- KML Best Practices: https://developers.google.com/kml/documentation/kmlreference")
     print("- XML Validation for KML: https://developers.google.com/kml/documentation/kmlreference#validation")
     print()
     print("Core development guidance:")
