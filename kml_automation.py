@@ -78,7 +78,10 @@ def _kml(tag: str) -> str:
 def _parse_date(value: str | None) -> date:
     if not value:
         return date.today()
-    return datetime.strptime(value, "%Y-%m-%d").date()
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError as exc:
+        raise ValueError(f"Invalid date format. Expected YYYY-MM-DD, got: {value}") from exc
 
 
 def _normalize_whitespace(node: ET.Element) -> None:
@@ -262,7 +265,7 @@ def print_resources() -> None:
     print("- OGC KML 2.2 Standard: https://www.ogc.org/standards/kml/")
     print("- Google KML Reference: https://developers.google.com/kml/documentation/kmlreference")
     print("- Google KML Tutorial: https://developers.google.com/kml/documentation/kml_tut")
-    print("- KML Best Practices: https://developers.google.com/kml/documentation/kmlreference")
+    print("- KML Best Practices: https://developers.google.com/kml/documentation/extendeddata")
     print("- XML Validation for KML: https://developers.google.com/kml/documentation/kmlreference#validation")
     print()
     print("Core development guidance:")
@@ -327,21 +330,33 @@ def main() -> None:
         clean_kml(args.input, args.output)
         print(f"Cleaned: {args.output}")
     elif args.command == "overlay":
-        overlay = apply_overlay(args.input, args.output, _parse_date(args.date), args.feedback_file)
+        try:
+            target_date = _parse_date(args.date)
+        except ValueError as exc:
+            parser.error(str(exc))
+        overlay = apply_overlay(args.input, args.output, target_date, args.feedback_file)
         print(f"Overlay '{overlay.identifier}' applied to: {args.output}")
     elif args.command == "build":
+        try:
+            target_date = _parse_date(args.date)
+        except ValueError as exc:
+            parser.error(str(exc))
         overlay = build_atomic_output(
             args.output,
             args.name,
             args.latitude,
             args.longitude,
             args.description,
-            _parse_date(args.date),
+            target_date,
             args.feedback_file,
         )
         print(f"Built atomically with overlay '{overlay.identifier}': {args.output}")
     elif args.command == "suggest-overlay":
-        overlay = choose_overlay(_parse_date(args.date), args.feedback_file)
+        try:
+            target_date = _parse_date(args.date)
+        except ValueError as exc:
+            parser.error(str(exc))
+        overlay = choose_overlay(target_date, args.feedback_file)
         print(f"{overlay.identifier} | {overlay.label}")
         print(overlay.description)
         print(f"tags={', '.join(overlay.tags)}")
