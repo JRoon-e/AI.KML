@@ -1,10 +1,10 @@
 # AI.KML
 
-Lightweight automated KML toolkit for:
+KML toolkit for:
 
-1. Learning and developing with expert KML resources  
-2. Auto creating and cleaning `.kml` outputs  
-3. Applying creative daily overlays that evolve with feedback
+1. Learning and developing with good resources  
+2. creating and cleaning `.kml` outputs for demonstration purposes
+3. Apply creative overlays ti the data that evolve with feedback
 
 ## Quick start
 
