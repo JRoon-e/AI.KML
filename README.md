@@ -14,7 +14,7 @@ Run from the repository root:
 python kml_automation.py resources
 ```
 
-Build a complete KML file atomically (create → clean → overlay):
+Build a complete KML file automatically (create → clean → overlay):
 
 ```bash
 python kml_automation.py build \
