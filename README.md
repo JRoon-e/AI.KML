@@ -3,7 +3,7 @@
 Lightweight automated KML toolkit for:
 
 1. Learning and developing with expert KML resources  
-2. Atomically creating and cleaning `.kml` outputs  
+2. Auto creating and cleaning `.kml` outputs  
 3. Applying creative daily overlays that evolve with feedback
 
 ## Quick start
