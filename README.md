@@ -11,14 +11,14 @@ Lightweight automated KML toolkit for:
 Run from the repository root:
 
 ```bash
-python /home/runner/work/AI.KML/AI.KML/kml_automation.py resources
+python kml_automation.py resources
 ```
 
 Build a complete KML file atomically (create → clean → overlay):
 
 ```bash
-python /home/runner/work/AI.KML/AI.KML/kml_automation.py build \
-  --output /home/runner/work/AI.KML/AI.KML/output/demo.kml \
+python kml_automation.py build \
+  --output output/demo.kml \
   --name "Demo Point" \
   --latitude 13.47 \
   --longitude 144.69 \
@@ -40,8 +40,8 @@ python /home/runner/work/AI.KML/AI.KML/kml_automation.py build \
 Create/update feedback:
 
 ```bash
-python /home/runner/work/AI.KML/AI.KML/kml_automation.py record-feedback \
-  --feedback-file /home/runner/work/AI.KML/AI.KML/output/overlay_feedback.json \
+python kml_automation.py record-feedback \
+  --feedback-file output/overlay_feedback.json \
   --overlay-id sunrise \
   --vote 1 \
   --note "Use this more often for storytelling maps."
